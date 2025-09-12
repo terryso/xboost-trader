@@ -1,11 +1,11 @@
 {
-  "session_id": "c30437d2-10b7-4b99-b526-8846d43a21d5",
-  "transcript_path": "/Users/nick/.claude/projects/-Users-nick-CascadeProjects-xboost-trader/c30437d2-10b7-4b99-b526-8846d43a21d5.jsonl",
+  "session_id": "f8949f13-8304-4cbc-99ce-85c268498e66",
+  "transcript_path": "/Users/nick/.claude/projects/-Users-nick-CascadeProjects-xboost-trader/f8949f13-8304-4cbc-99ce-85c268498e66.jsonl",
   "hook_event_name": "PreToolUse",
   "tool_name": "Edit",
   "tool_input": {
-    "file_path": "/Users/nick/CascadeProjects/xboost-trader/eslint.config.js",
-    "old_string": "      // TypeScript First - 严禁any类型\n      '@typescript-eslint/no-explicit-any': 'error',\n      '@typescript-eslint/no-implicit-any-catch': 'error',\n      '@typescript-eslint/strict-boolean-expressions': 'error',",
-    "new_string": "      // TypeScript First - 严禁any类型\n      '@typescript-eslint/no-explicit-any': 'error',\n      '@typescript-eslint/strict-boolean-expressions': 'error',"
+    "file_path": "/Users/nick/CascadeProjects/xboost-trader/src/repositories/BaseRepository.ts",
+    "old_string": "",
+    "new_string": "import { DatabaseConnection } from '../utils/DatabaseConnection.js';\n\nexport abstract class BaseRepository<T> {\n  constructor(protected db: DatabaseConnection) {}\n\n  abstract tableName: string;\n  abstract mapRowToEntity(row: any): T;\n  abstract mapEntityToRow(entity: T): any;\n\n  async findById(id: string): Promise<T | null> {\n    const sql = `SELECT * FROM ${this.tableName} WHERE id = ?`;\n    const rows = await this.db.query(sql, [id]);\n    \n    if (rows.length === 0) {\n      return null;\n    }\n    \n    return this.mapRowToEntity(rows[0]);\n  }\n\n  async save(entity: T): Promise<void> {\n    const row = this.mapEntityToRow(entity);\n    const columns = Object.keys(row);\n    const placeholders = columns.map(() => '?').join(', ');\n    const values = Object.values(row);\n\n    const sql = `INSERT OR REPLACE INTO ${this.tableName} (${columns.join(', ')}) VALUES (${placeholders})`;\n    await this.db.query(sql, values);\n  }\n\n  async findAll(): Promise<T[]> {\n    const sql = `SELECT * FROM ${this.tableName}`;\n    const rows = await this.db.query(sql);\n    \n    return rows.map(row => this.mapRowToEntity(row));\n  }\n\n  async delete(id: string): Promise<void> {\n    const sql = `DELETE FROM ${this.tableName} WHERE id = ?`;\n    await this.db.query(sql, [id]);\n  }\n\n  async executeInTransaction<R>(operation: () => Promise<R>): Promise<R> {\n    return await this.db.executeInTransaction(operation);\n  }\n}"
   }
 }

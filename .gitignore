@@ -37,6 +37,13 @@ private_keys/
 *.db
 *.sqlite
 *.sqlite3
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+# Keep data directory structure but ignore database files
+data/*
+!data/.gitkeep
+!data/README.md
 
 # Logs
 logs/

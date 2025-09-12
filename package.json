@@ -18,7 +18,12 @@
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
     "start": "node dist/app.js",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "db:migrate": "tsx scripts/migrate-db.ts migrate",
+    "db:rollback": "tsx scripts/migrate-db.ts rollback",
+    "db:status": "tsx scripts/migrate-db.ts status",
+    "db:reset": "tsx scripts/migrate-db.ts reset",
+    "db:setup": "npm run db:migrate"
   },
   "keywords": [
     "trading",
@@ -32,8 +37,9 @@
   "author": "XBoost Team",
   "license": "MIT",
   "dependencies": {
+    "@types/sqlite3": "^3.1.11",
     "commander": "^11.0.0",
-    "sqlite3": "^5.1.6",
+    "sqlite3": "^5.1.7",
     "winston": "^3.10.0"
   },
   "devDependencies": {
