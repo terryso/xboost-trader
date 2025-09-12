@@ -83,7 +83,7 @@ export interface IAppConfig {
 }
 
 // Database row types - raw data from SQLite
-export interface WalletRow {
+export interface IWalletRow {
   address: string;
   encrypted_private_key: string;
   supported_networks: string; // JSON string
@@ -91,7 +91,7 @@ export interface WalletRow {
   created_at: string; // SQLite datetime as string
 }
 
-export interface GridStrategyRow {
+export interface IGridStrategyRow {
   id: string;
   wallet_address: string;
   pair: string;
@@ -110,7 +110,7 @@ export interface GridStrategyRow {
   updated_at: string;
 }
 
-export interface GridOrderRow {
+export interface IGridOrderRow {
   id: string;
   strategy_id: string;
   price: number;
@@ -125,7 +125,7 @@ export interface GridOrderRow {
   cancelled_at?: string;
 }
 
-export interface TradeRow {
+export interface ITradeRow {
   id: string;
   strategy_id: string;
   order_id: string;
@@ -140,7 +140,7 @@ export interface TradeRow {
   timestamp: string;
 }
 
-export interface PriceHistoryRow {
+export interface IPriceHistoryRow {
   id: number;
   pair: string;
   price: number;
@@ -148,7 +148,7 @@ export interface PriceHistoryRow {
   timestamp: string;
 }
 
-export interface SystemLogRow {
+export interface ISystemLogRow {
   id: number;
   level: string;
   message: string;
@@ -157,7 +157,7 @@ export interface SystemLogRow {
   timestamp: string;
 }
 
-export interface AppConfigRow {
+export interface IAppConfigRow {
   key: string;
   value: string;
   description?: string;

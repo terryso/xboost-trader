@@ -1,6 +1,6 @@
 import { BaseRepository } from './BaseRepository';
-import { IGridOrder, GridOrderRow } from '../models/types/database.types';
-import { DatabaseConnection } from '../utils/DatabaseConnection';
+import type { IGridOrder, GridOrderRow } from '../models/types/database.types';
+import type { DatabaseConnection } from '../utils/DatabaseConnection';
 
 export class OrderRepository extends BaseRepository<IGridOrder, GridOrderRow> {
   constructor(db: DatabaseConnection) {
@@ -24,7 +24,7 @@ export class OrderRepository extends BaseRepository<IGridOrder, GridOrderRow> {
       gasPrice: row.gas_price,
       createdAt: new Date(row.created_at),
       filledAt: row.filled_at ? new Date(row.filled_at) : undefined,
-      cancelledAt: row.cancelled_at ? new Date(row.cancelled_at) : undefined
+      cancelledAt: row.cancelled_at ? new Date(row.cancelled_at) : undefined,
     };
   }
 
@@ -41,20 +41,26 @@ export class OrderRepository extends BaseRepository<IGridOrder, GridOrderRow> {
       gas_price: entity.gasPrice,
       created_at: entity.createdAt.toISOString(),
       filled_at: entity.filledAt?.toISOString(),
-      cancelled_at: entity.cancelledAt?.toISOString()
+      cancelled_at: entity.cancelledAt?.toISOString(),
     };
   }
 
   protected getInsertFields(): string[] {
-    return [
-      'id', 'strategy_id', 'price', 'amount', 'side', 'status', 'created_at'
-    ];
+    return ['id', 'strategy_id', 'price', 'amount', 'side', 'status', 'created_at'];
   }
 
   protected getUpdateFields(): string[] {
     return [
-      'strategy_id', 'price', 'amount', 'side', 'status',
-      'tx_hash', 'gas_used', 'gas_price', 'filled_at', 'cancelled_at'
+      'strategy_id',
+      'price',
+      'amount',
+      'side',
+      'status',
+      'tx_hash',
+      'gas_used',
+      'gas_price',
+      'filled_at',
+      'cancelled_at',
     ];
   }
 
@@ -98,17 +104,27 @@ export class OrderRepository extends BaseRepository<IGridOrder, GridOrderRow> {
   /**
    * Find orders within price range for a strategy
    */
-  async findByPriceRange(strategyId: string, minPrice: number, maxPrice: number): Promise<IGridOrder[]> {
-    return this.findByCondition(
-      'strategy_id = ? AND price BETWEEN ? AND ?',
-      [strategyId, minPrice, maxPrice]
-    );
+  async findByPriceRange(
+    strategyId: string,
+    minPrice: number,
+    maxPrice: number
+  ): Promise<IGridOrder[]> {
+    return this.findByCondition('strategy_id = ? AND price BETWEEN ? AND ?', [
+      strategyId,
+      minPrice,
+      maxPrice,
+    ]);
   }
 
   /**
    * Update order status to filled
    */
-  async markAsFilled(orderId: string, txHash: string, gasUsed?: number, gasPrice?: number): Promise<void> {
+  async markAsFilled(
+    orderId: string,
+    txHash: string,
+    gasUsed?: number,
+    gasPrice?: number
+  ): Promise<void> {
     try {
       const sql = `
         UPDATE grid_orders 
@@ -191,7 +207,7 @@ export class OrderRepository extends BaseRepository<IGridOrder, GridOrderRow> {
         FROM grid_orders
         WHERE strategy_id = ?
       `;
-      
+
       const result = await this.db.get<{
         total: number;
         pending: number;
@@ -207,7 +223,7 @@ export class OrderRepository extends BaseRepository<IGridOrder, GridOrderRow> {
         filled: result?.filled || 0,
         cancelled: result?.cancelled || 0,
         totalVolume: result?.total_volume || 0,
-        averagePrice: result?.average_price || 0
+        averagePrice: result?.average_price || 0,
       };
     } catch (error) {
       throw new Error(`Failed to get order statistics: ${error.message}`);
@@ -224,7 +240,7 @@ export class OrderRepository extends BaseRepository<IGridOrder, GridOrderRow> {
         ORDER BY created_at DESC 
         LIMIT ?
       `;
-      
+
       const rows = await this.db.query<GridOrderRow>(sql, [limit]);
       return rows.map(row => this.mapRowToEntity(row));
     } catch (error) {
@@ -253,7 +269,7 @@ export class OrderRepository extends BaseRepository<IGridOrder, GridOrderRow> {
         ORDER BY price DESC 
         LIMIT 1
       `;
-      
+
       const result = await this.db.get<{ price: number }>(sql, [strategyId, currentPrice]);
       return result?.price || null;
     } catch (error) {
@@ -275,7 +291,7 @@ export class OrderRepository extends BaseRepository<IGridOrder, GridOrderRow> {
         ORDER BY price ASC 
         LIMIT 1
       `;
-      
+
       const result = await this.db.get<{ price: number }>(sql, [strategyId, currentPrice]);
       return result?.price || null;
     } catch (error) {
@@ -290,13 +306,13 @@ export class OrderRepository extends BaseRepository<IGridOrder, GridOrderRow> {
     try {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
-      
+
       const sql = `
         DELETE FROM grid_orders 
         WHERE status IN ('filled', 'cancelled') 
           AND created_at < ?
       `;
-      
+
       const result = await this.db.run(sql, [cutoffDate.toISOString()]);
       return result.changes || 0;
     } catch (error) {

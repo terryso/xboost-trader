@@ -1,6 +1,6 @@
 import { BaseRepository } from './BaseRepository';
-import { IWallet, WalletRow } from '../models/types/database.types';
-import { DatabaseConnection } from '../utils/DatabaseConnection';
+import type { IWallet, WalletRow } from '../models/types/database.types';
+import type { DatabaseConnection } from '../utils/DatabaseConnection';
 
 export class WalletRepository extends BaseRepository<IWallet, WalletRow> {
   constructor(db: DatabaseConnection) {
@@ -15,9 +15,14 @@ export class WalletRepository extends BaseRepository<IWallet, WalletRow> {
     return {
       address: row.address,
       encryptedPrivateKey: row.encrypted_private_key,
-      supportedNetworks: JSON.parse(row.supported_networks) as ('linea' | 'bnb' | 'ethereum' | 'solana')[],
+      supportedNetworks: JSON.parse(row.supported_networks) as (
+        | 'linea'
+        | 'bnb'
+        | 'ethereum'
+        | 'solana'
+      )[],
       isDefault: row.is_default === 1,
-      createdAt: new Date(row.created_at)
+      createdAt: new Date(row.created_at),
     };
   }
 
@@ -27,7 +32,7 @@ export class WalletRepository extends BaseRepository<IWallet, WalletRow> {
       encrypted_private_key: entity.encryptedPrivateKey,
       supported_networks: JSON.stringify(entity.supportedNetworks),
       is_default: entity.isDefault ? 1 : 0,
-      created_at: entity.createdAt.toISOString()
+      created_at: entity.createdAt.toISOString(),
     };
   }
 
@@ -45,7 +50,7 @@ export class WalletRepository extends BaseRepository<IWallet, WalletRow> {
     try {
       const sql = `SELECT * FROM ${this.tableName} WHERE address = ?`;
       const row = await this.db.get<WalletRow>(sql, [address]);
-      
+
       if (!row) {
         return null;
       }
@@ -101,7 +106,7 @@ export class WalletRepository extends BaseRepository<IWallet, WalletRow> {
       const fields = this.getUpdateFields();
       const setClause = fields.map(field => `${field} = ?`).join(', ');
       const values = fields.map(field => row[field]);
-      
+
       // Add address to the end for WHERE clause
       values.push(entity.address);
 
@@ -133,10 +138,12 @@ export class WalletRepository extends BaseRepository<IWallet, WalletRow> {
       await this.db.transaction(async () => {
         // Unset all default wallets
         await this.db.run('UPDATE wallets SET is_default = 0');
-        
+
         // Set the specified wallet as default
-        const result = await this.db.run('UPDATE wallets SET is_default = 1 WHERE address = ?', [address]);
-        
+        const result = await this.db.run('UPDATE wallets SET is_default = 1 WHERE address = ?', [
+          address,
+        ]);
+
         if (!result || result.changes === 0) {
           throw new Error(`No wallet found with address ${address}`);
         }

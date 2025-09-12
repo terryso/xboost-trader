@@ -1,5 +1,5 @@
-import { DatabaseConnection } from '../utils/DatabaseConnection';
-import sqlite3 from 'sqlite3';
+import type { DatabaseConnection } from '../utils/DatabaseConnection';
+import type sqlite3 from 'sqlite3';
 
 export abstract class BaseRepository<TEntity, TRow = any> {
   protected db: DatabaseConnection;
@@ -20,7 +20,7 @@ export abstract class BaseRepository<TEntity, TRow = any> {
     try {
       const sql = `SELECT * FROM ${this.tableName} WHERE id = ?`;
       const row = await this.db.get<TRow>(sql, [id]);
-      
+
       if (!row) {
         return null;
       }
@@ -78,9 +78,11 @@ export abstract class BaseRepository<TEntity, TRow = any> {
     try {
       const row = this.mapEntityToRow(entity);
       const allFields = this.getInsertFields();
-      
+
       // Filter out fields that are undefined/null to let database handle defaults
-      const definedFields = allFields.filter(field => row[field] !== undefined && row[field] !== null);
+      const definedFields = allFields.filter(
+        field => row[field] !== undefined && row[field] !== null
+      );
       const values = definedFields.map(field => row[field]);
       const placeholders = definedFields.map(() => '?').join(', ');
 
@@ -97,7 +99,7 @@ export abstract class BaseRepository<TEntity, TRow = any> {
       const fields = this.getUpdateFields();
       const setClause = fields.map(field => `${field} = ?`).join(', ');
       const values = fields.map(field => row[field]);
-      
+
       // Add ID to the end for WHERE clause
       const entityWithId = entity as any;
       values.push(entityWithId.id);
@@ -148,13 +150,13 @@ export abstract class BaseRepository<TEntity, TRow = any> {
 
   // Utility method for custom queries
   protected async findByCondition(
-    condition: string, 
-    params: any[], 
+    condition: string,
+    params: any[],
     limit?: number
   ): Promise<TEntity[]> {
     try {
       let sql = `SELECT * FROM ${this.tableName} WHERE ${condition}`;
-      
+
       if (limit) {
         sql += ' LIMIT ?';
         params.push(limit);
@@ -172,7 +174,7 @@ export abstract class BaseRepository<TEntity, TRow = any> {
     try {
       const sql = `SELECT * FROM ${this.tableName} WHERE ${condition} LIMIT 1`;
       const row = await this.db.get<TRow>(sql, params);
-      
+
       if (!row) {
         return null;
       }

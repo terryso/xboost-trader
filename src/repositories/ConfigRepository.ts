@@ -1,6 +1,6 @@
 import { BaseRepository } from './BaseRepository';
-import { IAppConfig, AppConfigRow } from '../models/types/database.types';
-import { DatabaseConnection } from '../utils/DatabaseConnection';
+import type { IAppConfig, AppConfigRow } from '../models/types/database.types';
+import type { DatabaseConnection } from '../utils/DatabaseConnection';
 
 export class ConfigRepository extends BaseRepository<IAppConfig, AppConfigRow> {
   constructor(db: DatabaseConnection) {
@@ -16,7 +16,7 @@ export class ConfigRepository extends BaseRepository<IAppConfig, AppConfigRow> {
       key: row.key,
       value: row.value,
       description: row.description,
-      updatedAt: new Date(row.updated_at)
+      updatedAt: new Date(row.updated_at),
     };
   }
 
@@ -25,7 +25,7 @@ export class ConfigRepository extends BaseRepository<IAppConfig, AppConfigRow> {
       key: entity.key,
       value: entity.value,
       description: entity.description,
-      updated_at: entity.updatedAt.toISOString()
+      updated_at: entity.updatedAt.toISOString(),
     };
   }
 
@@ -43,7 +43,7 @@ export class ConfigRepository extends BaseRepository<IAppConfig, AppConfigRow> {
     try {
       const sql = `SELECT * FROM ${this.tableName} WHERE key = ?`;
       const row = await this.db.get<AppConfigRow>(sql, [key]);
-      
+
       if (!row) {
         return null;
       }
@@ -99,7 +99,7 @@ export class ConfigRepository extends BaseRepository<IAppConfig, AppConfigRow> {
       const fields = this.getUpdateFields();
       const setClause = fields.map(field => `${field} = ?`).join(', ');
       const values = fields.map(field => row[field]);
-      
+
       // Add key to the end for WHERE clause
       values.push(entity.key);
 
@@ -137,9 +137,9 @@ export class ConfigRepository extends BaseRepository<IAppConfig, AppConfigRow> {
         key,
         value,
         description,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
-      
+
       await this.save(config);
     } catch (error) {
       throw new Error(`Failed to set config value: ${error.message}`);
@@ -153,7 +153,7 @@ export class ConfigRepository extends BaseRepository<IAppConfig, AppConfigRow> {
     try {
       const value = await this.getValue(key);
       if (value === null) return null;
-      
+
       const parsed = parseFloat(value);
       return isNaN(parsed) ? null : parsed;
     } catch (error) {
@@ -175,14 +175,14 @@ export class ConfigRepository extends BaseRepository<IAppConfig, AppConfigRow> {
     try {
       const value = await this.getValue(key);
       if (value === null) return null;
-      
+
       const lowerValue = value.toLowerCase();
       if (lowerValue === 'true' || lowerValue === '1' || lowerValue === 'yes') {
         return true;
       } else if (lowerValue === 'false' || lowerValue === '0' || lowerValue === 'no') {
         return false;
       }
-      
+
       return null;
     } catch (error) {
       throw new Error(`Failed to get boolean config value: ${error.message}`);
@@ -203,7 +203,7 @@ export class ConfigRepository extends BaseRepository<IAppConfig, AppConfigRow> {
     try {
       const value = await this.getValue(key);
       if (value === null) return null;
-      
+
       try {
         return JSON.parse(value) as T;
       } catch (parseError) {
@@ -246,11 +246,11 @@ export class ConfigRepository extends BaseRepository<IAppConfig, AppConfigRow> {
     try {
       const configs = await this.findAll();
       const result: Record<string, string> = {};
-      
+
       configs.forEach(config => {
         result[config.key] = config.value;
       });
-      
+
       return result;
     } catch (error) {
       throw new Error(`Failed to get all configs as object: ${error.message}`);
@@ -260,7 +260,9 @@ export class ConfigRepository extends BaseRepository<IAppConfig, AppConfigRow> {
   /**
    * Bulk update multiple configuration values
    */
-  async bulkUpdate(configs: Array<{ key: string; value: string; description?: string }>): Promise<void> {
+  async bulkUpdate(
+    configs: Array<{ key: string; value: string; description?: string }>
+  ): Promise<void> {
     try {
       await this.db.transaction(async () => {
         for (const config of configs) {

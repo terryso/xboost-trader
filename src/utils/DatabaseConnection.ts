@@ -1,12 +1,12 @@
 import sqlite3 from 'sqlite3';
 import { promisify } from 'util';
-import { DatabaseConfig } from '../config/database.config';
+import type { DatabaseConfig } from '../config/database.config';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
 export class DatabaseConnection {
   private db: sqlite3.Database | null = null;
-  private config: DatabaseConfig;
+  private readonly config: DatabaseConfig;
   private isInitialized = false;
 
   constructor(config: DatabaseConfig) {
@@ -20,8 +20,8 @@ export class DatabaseConnection {
 
     return new Promise<void>((resolve, reject) => {
       const dbPath = this.config.inMemory ? ':memory:' : this.config.path;
-      
-      this.db = new sqlite3.Database(dbPath, (err) => {
+
+      this.db = new sqlite3.Database(dbPath, err => {
         if (err) {
           reject(new Error(`Failed to connect to database: ${err.message}`));
           return;
@@ -71,10 +71,10 @@ export class DatabaseConnection {
     try {
       const schemaPath = join(__dirname, '../../database/schema.sql');
       const schemaSql = readFileSync(schemaPath, 'utf8');
-      
+
       // Use exec for bulk SQL execution instead of individual statements
       const execAsync = promisify(this.db.exec.bind(this.db));
-      
+
       await execAsync(schemaSql);
     } catch (error) {
       throw new Error(`Failed to initialize database schema: ${error.message}`);
@@ -94,7 +94,7 @@ export class DatabaseConnection {
     }
 
     const allAsync = promisify(this.db.all.bind(this.db));
-    
+
     try {
       const rows = await allAsync(sql, params);
       return rows as T[];
@@ -109,7 +109,7 @@ export class DatabaseConnection {
     }
 
     const getAsync = promisify(this.db.get.bind(this.db));
-    
+
     try {
       const row = await getAsync(sql, params);
       return row as T | null;
@@ -124,7 +124,7 @@ export class DatabaseConnection {
     }
 
     const runAsync = promisify(this.db.run.bind(this.db));
-    
+
     try {
       return await runAsync(sql, params);
     } catch (error) {
@@ -138,7 +138,7 @@ export class DatabaseConnection {
     }
 
     const runAsync = promisify(this.db.run.bind(this.db));
-    
+
     try {
       await runAsync('BEGIN TRANSACTION');
       const result = await callback(this.db);
@@ -165,7 +165,7 @@ export class DatabaseConnection {
     }
 
     return new Promise<void>((resolve, reject) => {
-      this.db!.close((err) => {
+      this.db!.close(err => {
         if (err) {
           reject(new Error(`Failed to close database: ${err.message}`));
         } else {

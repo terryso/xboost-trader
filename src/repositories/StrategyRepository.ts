@@ -1,6 +1,6 @@
 import { BaseRepository } from './BaseRepository';
-import { IGridStrategy, GridStrategyRow } from '../models/types/database.types';
-import { DatabaseConnection } from '../utils/DatabaseConnection';
+import type { IGridStrategy, GridStrategyRow } from '../models/types/database.types';
+import type { DatabaseConnection } from '../utils/DatabaseConnection';
 
 export class StrategyRepository extends BaseRepository<IGridStrategy, GridStrategyRow> {
   constructor(db: DatabaseConnection) {
@@ -28,7 +28,7 @@ export class StrategyRepository extends BaseRepository<IGridStrategy, GridStrate
       totalProfit: row.total_profit,
       executedOrdersCount: row.executed_orders_count,
       createdAt: new Date(row.created_at),
-      updatedAt: new Date(row.updated_at)
+      updatedAt: new Date(row.updated_at),
     };
   }
 
@@ -49,25 +49,47 @@ export class StrategyRepository extends BaseRepository<IGridStrategy, GridStrate
       total_profit: entity.totalProfit,
       executed_orders_count: entity.executedOrdersCount,
       created_at: entity.createdAt.toISOString(),
-      updated_at: entity.updatedAt.toISOString()
+      updated_at: entity.updatedAt.toISOString(),
     };
   }
 
   protected getInsertFields(): string[] {
     return [
-      'id', 'wallet_address', 'pair', 'network', 'grid_type',
-      'upper_price', 'lower_price', 'grid_count', 'base_amount',
-      'stop_loss', 'max_position_ratio', 'status', 'total_profit',
-      'executed_orders_count', 'created_at', 'updated_at'
+      'id',
+      'wallet_address',
+      'pair',
+      'network',
+      'grid_type',
+      'upper_price',
+      'lower_price',
+      'grid_count',
+      'base_amount',
+      'stop_loss',
+      'max_position_ratio',
+      'status',
+      'total_profit',
+      'executed_orders_count',
+      'created_at',
+      'updated_at',
     ];
   }
 
   protected getUpdateFields(): string[] {
     return [
-      'wallet_address', 'pair', 'network', 'grid_type',
-      'upper_price', 'lower_price', 'grid_count', 'base_amount',
-      'stop_loss', 'max_position_ratio', 'status', 'total_profit',
-      'executed_orders_count', 'updated_at'
+      'wallet_address',
+      'pair',
+      'network',
+      'grid_type',
+      'upper_price',
+      'lower_price',
+      'grid_count',
+      'base_amount',
+      'stop_loss',
+      'max_position_ratio',
+      'status',
+      'total_profit',
+      'executed_orders_count',
+      'updated_at',
     ];
   }
 
@@ -106,7 +128,8 @@ export class StrategyRepository extends BaseRepository<IGridStrategy, GridStrate
    */
   async updateStatus(strategyId: string, status: 'active' | 'paused' | 'stopped'): Promise<void> {
     try {
-      const sql = 'UPDATE grid_strategies SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
+      const sql =
+        'UPDATE grid_strategies SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
       const result = await this.db.run(sql, [status, strategyId]);
 
       if (result.changes === 0) {
@@ -142,7 +165,9 @@ export class StrategyRepository extends BaseRepository<IGridStrategy, GridStrate
   /**
    * Get strategies with summary statistics
    */
-  async getStrategySummaries(walletAddress?: string): Promise<Array<IGridStrategy & { pendingOrders: number; filledOrders: number }>> {
+  async getStrategySummaries(
+    walletAddress?: string
+  ): Promise<Array<IGridStrategy & { pendingOrders: number; filledOrders: number }>> {
     try {
       let sql = `
         SELECT 
@@ -152,22 +177,24 @@ export class StrategyRepository extends BaseRepository<IGridStrategy, GridStrate
         FROM grid_strategies gs
         LEFT JOIN grid_orders go ON gs.id = go.strategy_id
       `;
-      
+
       const params: any[] = [];
-      
+
       if (walletAddress) {
         sql += ' WHERE gs.wallet_address = ?';
         params.push(walletAddress);
       }
-      
+
       sql += ' GROUP BY gs.id ORDER BY gs.created_at DESC';
 
-      const rows = await this.db.query<GridStrategyRow & { pending_orders: number; filled_orders: number }>(sql, params);
-      
+      const rows = await this.db.query<
+        GridStrategyRow & { pending_orders: number; filled_orders: number }
+      >(sql, params);
+
       return rows.map(row => ({
         ...this.mapRowToEntity(row),
         pendingOrders: row.pending_orders,
-        filledOrders: row.filled_orders
+        filledOrders: row.filled_orders,
       }));
     } catch (error) {
       throw new Error(`Failed to get strategy summaries: ${error.message}`);
@@ -185,7 +212,7 @@ export class StrategyRepository extends BaseRepository<IGridStrategy, GridStrate
         ORDER BY total_profit DESC 
         LIMIT ?
       `;
-      
+
       const rows = await this.db.query<GridStrategyRow>(sql, [limit]);
       return rows.map(row => this.mapRowToEntity(row));
     } catch (error) {
@@ -205,16 +232,16 @@ export class StrategyRepository extends BaseRepository<IGridStrategy, GridStrate
         FROM grid_strategies
         GROUP BY status
       `;
-      
+
       const rows = await this.db.query<{ status: string; count: number }>(sql);
-      
+
       const result = { active: 0, paused: 0, stopped: 0 };
       rows.forEach(row => {
         if (row.status === 'active') result.active = row.count;
         else if (row.status === 'paused') result.paused = row.count;
         else if (row.status === 'stopped') result.stopped = row.count;
       });
-      
+
       return result;
     } catch (error) {
       throw new Error(`Failed to count strategies by status: ${error.message}`);

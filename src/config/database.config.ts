@@ -1,4 +1,4 @@
-export interface DatabaseConfig {
+export interface IDatabaseConfig {
   path: string;
   inMemory: boolean;
   enableWAL: boolean;
@@ -7,20 +7,20 @@ export interface DatabaseConfig {
   busyTimeout: number;
 }
 
-export const databaseConfig: DatabaseConfig = {
-  path: process.env.DATABASE_PATH || './data/xboost-trader.db',
+export const databaseConfig: IDatabaseConfig = {
+  path: (typeof process !== 'undefined' ? process.env.DATABASE_PATH : undefined) ?? './data/xboost-trader.db',
   inMemory: false,
   enableWAL: true,
   enableForeignKeys: true,
   maxConnections: 10,
-  busyTimeout: 30000
+  busyTimeout: 30000,
 };
 
-export const testDatabaseConfig: DatabaseConfig = {
+export const testDatabaseConfig: IDatabaseConfig = {
   path: ':memory:',
   inMemory: true,
   enableWAL: false,
   enableForeignKeys: true,
   maxConnections: 1,
-  busyTimeout: 5000
+  busyTimeout: 5000,
 };

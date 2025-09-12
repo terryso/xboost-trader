@@ -1,6 +1,6 @@
 import { BaseRepository } from './BaseRepository';
-import { ITrade, TradeRow } from '../models/types/database.types';
-import { DatabaseConnection } from '../utils/DatabaseConnection';
+import type { ITrade, TradeRow } from '../models/types/database.types';
+import type { DatabaseConnection } from '../utils/DatabaseConnection';
 
 export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
   constructor(db: DatabaseConnection) {
@@ -24,7 +24,7 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
       profit: row.profit,
       txHash: row.tx_hash,
       blockNumber: row.block_number,
-      timestamp: new Date(row.timestamp)
+      timestamp: new Date(row.timestamp),
     };
   }
 
@@ -41,21 +41,40 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
       profit: entity.profit,
       tx_hash: entity.txHash,
       block_number: entity.blockNumber,
-      timestamp: entity.timestamp.toISOString()
+      timestamp: entity.timestamp.toISOString(),
     };
   }
 
   protected getInsertFields(): string[] {
     return [
-      'id', 'strategy_id', 'order_id', 'pair', 'side', 'price',
-      'amount', 'fee', 'profit', 'tx_hash', 'block_number', 'timestamp'
+      'id',
+      'strategy_id',
+      'order_id',
+      'pair',
+      'side',
+      'price',
+      'amount',
+      'fee',
+      'profit',
+      'tx_hash',
+      'block_number',
+      'timestamp',
     ];
   }
 
   protected getUpdateFields(): string[] {
     return [
-      'strategy_id', 'order_id', 'pair', 'side', 'price',
-      'amount', 'fee', 'profit', 'tx_hash', 'block_number', 'timestamp'
+      'strategy_id',
+      'order_id',
+      'pair',
+      'side',
+      'price',
+      'amount',
+      'fee',
+      'profit',
+      'tx_hash',
+      'block_number',
+      'timestamp',
     ];
   }
 
@@ -100,10 +119,10 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
    * Find trades within date range
    */
   async findByDateRange(startDate: Date, endDate: Date): Promise<ITrade[]> {
-    return this.findByCondition(
-      'timestamp BETWEEN ? AND ?',
-      [startDate.toISOString(), endDate.toISOString()]
-    );
+    return this.findByCondition('timestamp BETWEEN ? AND ?', [
+      startDate.toISOString(),
+      endDate.toISOString(),
+    ]);
   }
 
   /**
@@ -116,7 +135,7 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
         ORDER BY timestamp DESC 
         LIMIT ?
       `;
-      
+
       const rows = await this.db.query<TradeRow>(sql, [limit]);
       return rows.map(row => this.mapRowToEntity(row));
     } catch (error) {
@@ -150,7 +169,7 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
         FROM trades
         WHERE strategy_id = ?
       `;
-      
+
       const result = await this.db.get<{
         total_profit: number;
         total_fees: number;
@@ -166,7 +185,7 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
         totalVolume: result?.total_volume || 0,
         tradeCount: result?.trade_count || 0,
         averageProfit: result?.average_profit || 0,
-        winRate: result?.win_rate || 0
+        winRate: result?.win_rate || 0,
       };
     } catch (error) {
       throw new Error(`Failed to get profit statistics: ${error.message}`);
@@ -176,12 +195,17 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
   /**
    * Get daily profit summary for a strategy
    */
-  async getDailyProfitSummary(strategyId: string, days: number = 30): Promise<Array<{
-    date: string;
-    profit: number;
-    volume: number;
-    tradeCount: number;
-  }>> {
+  async getDailyProfitSummary(
+    strategyId: string,
+    days: number = 30
+  ): Promise<
+    Array<{
+      date: string;
+      profit: number;
+      volume: number;
+      tradeCount: number;
+    }>
+  > {
     try {
       const sql = `
         SELECT 
@@ -195,7 +219,7 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
         GROUP BY DATE(timestamp)
         ORDER BY date DESC
       `;
-      
+
       const rows = await this.db.query<{
         date: string;
         profit: number;
@@ -207,7 +231,7 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
         date: row.date,
         profit: row.profit,
         volume: row.volume,
-        tradeCount: row.trade_count
+        tradeCount: row.trade_count,
       }));
     } catch (error) {
       throw new Error(`Failed to get daily profit summary: ${error.message}`);
@@ -217,12 +241,14 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
   /**
    * Get top performing pairs by profit
    */
-  async getTopProfitablePairs(limit: number = 10): Promise<Array<{
-    pair: string;
-    totalProfit: number;
-    tradeCount: number;
-    averageProfit: number;
-  }>> {
+  async getTopProfitablePairs(limit: number = 10): Promise<
+    Array<{
+      pair: string;
+      totalProfit: number;
+      tradeCount: number;
+      averageProfit: number;
+    }>
+  > {
     try {
       const sql = `
         SELECT 
@@ -236,7 +262,7 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
         ORDER BY total_profit DESC
         LIMIT ?
       `;
-      
+
       const rows = await this.db.query<{
         pair: string;
         total_profit: number;
@@ -248,7 +274,7 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
         pair: row.pair,
         totalProfit: row.total_profit,
         tradeCount: row.trade_count,
-        averageProfit: row.average_profit
+        averageProfit: row.average_profit,
       }));
     } catch (error) {
       throw new Error(`Failed to get top profitable pairs: ${error.message}`);
@@ -273,9 +299,9 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
           COALESCE(AVG(price * amount), 0) as average_trade_size
         FROM trades
       `;
-      
+
       const params: any[] = [];
-      
+
       if (strategyId) {
         sql += ' WHERE strategy_id = ?';
         params.push(strategyId);
@@ -292,7 +318,7 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
         totalVolume: result?.total_volume || 0,
         buyVolume: result?.buy_volume || 0,
         sellVolume: result?.sell_volume || 0,
-        averageTradeSize: result?.average_trade_size || 0
+        averageTradeSize: result?.average_trade_size || 0,
       };
     } catch (error) {
       throw new Error(`Failed to get volume statistics: ${error.message}`);
@@ -306,19 +332,19 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
     try {
       let sql = 'SELECT * FROM trades WHERE profit = (SELECT MAX(profit) FROM trades';
       const params: any[] = [];
-      
+
       if (strategyId) {
         sql += ' WHERE strategy_id = ?';
         params.push(strategyId);
       }
-      
+
       sql += ')';
-      
+
       if (strategyId) {
         sql += ' AND strategy_id = ?';
         params.push(strategyId);
       }
-      
+
       sql += ' LIMIT 1';
 
       const row = await this.db.get<TradeRow>(sql, params);
@@ -335,7 +361,7 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
     try {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
-      
+
       const sql = 'DELETE FROM trades WHERE timestamp < ?';
       const result = await this.db.run(sql, [cutoffDate.toISOString()]);
       return result.changes || 0;
@@ -347,12 +373,14 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
   /**
    * Get monthly profit report
    */
-  async getMonthlyProfitReport(year?: number): Promise<Array<{
-    month: string;
-    profit: number;
-    volume: number;
-    tradeCount: number;
-  }>> {
+  async getMonthlyProfitReport(year?: number): Promise<
+    Array<{
+      month: string;
+      profit: number;
+      volume: number;
+      tradeCount: number;
+    }>
+  > {
     try {
       let sql = `
         SELECT 
@@ -362,14 +390,14 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
           COUNT(*) as trade_count
         FROM trades
       `;
-      
+
       const params: any[] = [];
-      
+
       if (year) {
         sql += ` WHERE strftime('%Y', timestamp) = ?`;
         params.push(year.toString());
       }
-      
+
       sql += ` GROUP BY strftime('%Y-%m', timestamp) ORDER BY month DESC`;
 
       const rows = await this.db.query<{
@@ -383,7 +411,7 @@ export class TradeRepository extends BaseRepository<ITrade, TradeRow> {
         month: row.month,
         profit: row.profit,
         volume: row.volume,
-        tradeCount: row.trade_count
+        tradeCount: row.trade_count,
       }));
     } catch (error) {
       throw new Error(`Failed to get monthly profit report: ${error.message}`);
