@@ -80,17 +80,19 @@ tests/e2e/
 
 ```typescript
 // tests/cli/commands/grid-commands.test.ts
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GridCommand } from '../../../src/cli/commands/GridCommand';
 import { StrategyEngine } from '../../../src/services/StrategyEngine';
 import { CLITestHelper } from '../../helpers/cli-test-helper';
+import type { MockedObject } from 'vitest';
 
 describe('GridCommand', () => {
   let gridCommand: GridCommand;
-  let mockStrategyEngine: jest.Mocked<StrategyEngine>;
+  let mockStrategyEngine: MockedObject<StrategyEngine>;
   let cliHelper: CLITestHelper;
 
-  beforeEach(() => {
-    mockStrategyEngine = jest.createMockFromModule('../../../src/services/StrategyEngine');
+  beforeEach(async () => {
+    mockStrategyEngine = vi.mocked(await import('../../../src/services/StrategyEngine'));
     gridCommand = new GridCommand(mockStrategyEngine);
     cliHelper = new CLITestHelper();
   });
@@ -129,21 +131,23 @@ describe('GridCommand', () => {
 
 ```typescript
 // tests/backend/services/strategy-engine.test.ts
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { StrategyEngine } from '../../../src/services/StrategyEngine';
 import { StrategyRepository } from '../../../src/repositories/StrategyRepository';
 import { RiskManager } from '../../../src/services/RiskManager';
 import { GridCalculator } from '../../../src/utils/GridCalculator';
+import type { MockedObject } from 'vitest';
 
 describe('StrategyEngine', () => {
   let strategyEngine: StrategyEngine;
-  let mockRepository: jest.Mocked<StrategyRepository>;
-  let mockRiskManager: jest.Mocked<RiskManager>;
-  let mockGridCalculator: jest.Mocked<GridCalculator>;
+  let mockRepository: MockedObject<StrategyRepository>;
+  let mockRiskManager: MockedObject<RiskManager>;
+  let mockGridCalculator: MockedObject<GridCalculator>;
 
-  beforeEach(() => {
-    mockRepository = jest.createMockFromModule('../../../src/repositories/StrategyRepository');
-    mockRiskManager = jest.createMockFromModule('../../../src/services/RiskManager');
-    mockGridCalculator = jest.createMockFromModule('../../../src/utils/GridCalculator');
+  beforeEach(async () => {
+    mockRepository = vi.mocked(await import('../../../src/repositories/StrategyRepository'));
+    mockRiskManager = vi.mocked(await import('../../../src/services/RiskManager'));
+    mockGridCalculator = vi.mocked(await import('../../../src/utils/GridCalculator'));
 
     strategyEngine = new StrategyEngine(
       mockRepository,
@@ -194,6 +198,7 @@ describe('StrategyEngine', () => {
 
 ```typescript
 // tests/e2e/grid-strategy-lifecycle.test.ts
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { DatabaseTestHelper } from '../helpers/database-test-helper';

@@ -16,7 +16,7 @@
 | File Storage | 本地文件系统 | - | 配置文件和私钥存储 | 安全性最高，无网络传输风险 |
 | Authentication | AES-256 加密 | - | 私钥保护 | 军用级加密标准，保护用户资产安全 |
 | Frontend Testing | 不适用 | - | 无前端界面 | CLI 应用专注后端逻辑测试 |
-| Backend Testing | Jest | ^29.0.0 | 单元和集成测试 | 成熟的 Node.js 测试框架 |
+| Backend Testing | Vitest | ^1.0.0 | 单元和集成测试 | 快速的 Vite 原生测试框架，与 TypeScript 深度集成 |
 | E2E Testing | 自定义脚本 | - | 交易流程端到端测试 | 模拟真实交易场景验证 |
 | Build Tool | tsc (TypeScript) | ^5.0.0 | TypeScript 编译 | 官方编译器，性能最优 |
 | Bundler | 不需要 | - | Node.js 直接运行 | 避免打包复杂性 |

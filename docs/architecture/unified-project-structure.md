@@ -122,7 +122,7 @@ xboost-trader/
 ├── package.json             # 项目依赖和脚本
 ├── package-lock.json        # 锁定依赖版本
 ├── tsconfig.json            # TypeScript 配置
-├── jest.config.js           # Jest 测试配置
+├── vitest.config.ts         # Vitest 测试配置
 ├── eslint.config.js         # ESLint 代码规范
 ├── prettier.config.js       # Prettier 代码格式化
 ├── ecosystem.config.js      # PM2 进程管理配置

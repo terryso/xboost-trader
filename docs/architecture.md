@@ -118,7 +118,7 @@ graph TB
 | File Storage | 本地文件系统 | - | 配置文件和私钥存储 | 安全性最高，无网络传输风险 |
 | Authentication | AES-256 加密 | - | 私钥保护 | 军用级加密标准，保护用户资产安全 |
 | Frontend Testing | 不适用 | - | 无前端界面 | CLI 应用专注后端逻辑测试 |
-| Backend Testing | Jest | ^29.0.0 | 单元和集成测试 | 成熟的 Node.js 测试框架 |
+| Backend Testing | Vitest | ^1.0.0 | 单元和集成测试 | 快速的 Vite 原生测试框架，与 TypeScript 深度集成 |
 | E2E Testing | 自定义脚本 | - | 交易流程端到端测试 | 模拟真实交易场景验证 |
 | Build Tool | tsc (TypeScript) | ^5.0.0 | TypeScript 编译 | 官方编译器，性能最优 |
 | Bundler | 不需要 | - | Node.js 直接运行 | 避免打包复杂性 |
@@ -1289,7 +1289,7 @@ xboost-trader/
 ├── package.json             # 项目依赖和脚本
 ├── package-lock.json        # 锁定依赖版本
 ├── tsconfig.json            # TypeScript 配置
-├── jest.config.js           # Jest 测试配置
+├── vitest.config.ts         # Vitest 测试配置
 ├── eslint.config.js         # ESLint 代码规范
 ├── prettier.config.js       # Prettier 代码格式化
 ├── ecosystem.config.js      # PM2 进程管理配置
@@ -1635,11 +1635,11 @@ import { CLITestHelper } from '../../helpers/cli-test-helper';
 
 describe('GridCommand', () => {
   let gridCommand: GridCommand;
-  let mockStrategyEngine: jest.Mocked<StrategyEngine>;
+  let mockStrategyEngine: MockedObject<StrategyEngine>;
   let cliHelper: CLITestHelper;
 
   beforeEach(() => {
-    mockStrategyEngine = jest.createMockFromModule('../../../src/services/StrategyEngine');
+    mockStrategyEngine = vi.mocked(await import('../../../src/services/StrategyEngine'));
     gridCommand = new GridCommand(mockStrategyEngine);
     cliHelper = new CLITestHelper();
   });
@@ -1685,14 +1685,14 @@ import { GridCalculator } from '../../../src/utils/GridCalculator';
 
 describe('StrategyEngine', () => {
   let strategyEngine: StrategyEngine;
-  let mockRepository: jest.Mocked<StrategyRepository>;
-  let mockRiskManager: jest.Mocked<RiskManager>;
-  let mockGridCalculator: jest.Mocked<GridCalculator>;
+  let mockRepository: MockedObject<StrategyRepository>;
+  let mockRiskManager: MockedObject<RiskManager>;
+  let mockGridCalculator: MockedObject<GridCalculator>;
 
   beforeEach(() => {
-    mockRepository = jest.createMockFromModule('../../../src/repositories/StrategyRepository');
-    mockRiskManager = jest.createMockFromModule('../../../src/services/RiskManager');
-    mockGridCalculator = jest.createMockFromModule('../../../src/utils/GridCalculator');
+    mockRepository = vi.mocked(await import('../../../src/repositories/StrategyRepository'));
+    mockRiskManager = vi.mocked(await import('../../../src/services/RiskManager'));
+    mockGridCalculator = vi.mocked(await import('../../../src/utils/GridCalculator'));
 
     strategyEngine = new StrategyEngine(
       mockRepository,

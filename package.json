@@ -1,0 +1,61 @@
+{
+  "name": "xboost-trader",
+  "version": "0.1.0",
+  "description": "XBoost Trader - Advanced Grid Trading Bot for OKX DEX",
+  "main": "dist/app.js",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "dev": "tsx watch src/app.ts",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "start": "node dist/app.js",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "trading",
+    "grid",
+    "okx",
+    "dex",
+    "cli",
+    "typescript",
+    "bot"
+  ],
+  "author": "XBoost Team",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.0.0",
+    "sqlite3": "^5.1.6",
+    "winston": "^3.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "eslint": "^8.50.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}

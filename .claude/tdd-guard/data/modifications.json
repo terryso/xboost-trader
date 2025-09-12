@@ -1,0 +1,11 @@
+{
+  "session_id": "c30437d2-10b7-4b99-b526-8846d43a21d5",
+  "transcript_path": "/Users/nick/.claude/projects/-Users-nick-CascadeProjects-xboost-trader/c30437d2-10b7-4b99-b526-8846d43a21d5.jsonl",
+  "hook_event_name": "PreToolUse",
+  "tool_name": "Edit",
+  "tool_input": {
+    "file_path": "/Users/nick/CascadeProjects/xboost-trader/eslint.config.js",
+    "old_string": "      // TypeScript First - 严禁any类型\n      '@typescript-eslint/no-explicit-any': 'error',\n      '@typescript-eslint/no-implicit-any-catch': 'error',\n      '@typescript-eslint/strict-boolean-expressions': 'error',",
+    "new_string": "      // TypeScript First - 严禁any类型\n      '@typescript-eslint/no-explicit-any': 'error',\n      '@typescript-eslint/strict-boolean-expressions': 'error',"
+  }
+}
