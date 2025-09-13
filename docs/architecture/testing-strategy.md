@@ -12,67 +12,26 @@ Frontend Unit    Backend Unit
 
 ## Test Organization
 
-### Frontend Tests
-
-由于是CLI应用，前端测试主要聚焦于命令行交互和输出格式：
+Our testing strategy is organized by test type, which is a pragmatic and widely-used convention. This makes it easy to run specific categories of tests (e.g., all unit tests) and is intuitive for developers.
 
 ```text
-tests/cli/
-├── commands/                  # 命令测试
-│   ├── grid-commands.test.ts     # 网格相关命令
-│   ├── config-commands.test.ts   # 配置相关命令
-│   ├── monitor-commands.test.ts  # 监控命令
-│   └── stats-commands.test.ts    # 统计命令
-├── utils/                     # CLI工具测试
-│   ├── table-builder.test.ts     # 表格输出
-│   ├── input-validator.test.ts   # 输入验证
-│   └── color-console.test.ts     # 颜色输出
-└── integration/               # CLI集成测试
-    ├── command-flow.test.ts      # 命令流程测试
-    └── error-handling.test.ts    # 错误处理测试
-```
-
-### Backend Tests
-
-```text
-tests/backend/
+tests/
 ├── unit/                      # 单元测试
-│   ├── services/
-│   │   ├── strategy-engine.test.ts
-│   │   ├── price-monitor.test.ts
-│   │   ├── risk-manager.test.ts
-│   │   ├── okx-service.test.ts
-│   │   └── wallet-manager.test.ts
-│   ├── repositories/
-│   │   ├── strategy-repository.test.ts
-│   │   ├── order-repository.test.ts
-│   │   └── trade-repository.test.ts
-│   ├── utils/
-│   │   ├── grid-calculator.test.ts
-│   │   ├── crypto-utils.test.ts
-│   │   └── performance-monitor.test.ts
-│   └── models/
-│       ├── grid-strategy.test.ts
-│       └── grid-order.test.ts
+│   ├── cli/                   # CLI相关的单元测试
+│   │   └── utils/             # CLI工具的单元测试
+│   ├── services/              # 服务层的单元测试
+│   ├── repositories/          # 数据仓库层的单元测试
+│   └── utils/                 # 通用工具的单元测试
 ├── integration/               # 集成测试
-│   ├── database-operations.test.ts
-│   ├── okx-api-integration.test.ts
-│   ├── strategy-lifecycle.test.ts
-│   └── price-monitoring.test.ts
-└── performance/               # 性能测试
-    ├── load-testing.test.ts
-    └── memory-usage.test.ts
+│   # (e.g., database-connection.test.ts, security-integration.test.ts)
+├── e2e/                       # 端到端测试
+│   # (e.g., grid-strategy-lifecycle.test.ts)
+├── fixtures/                  # 测试数据
+│   # (e.g., mock-responses.json)
+└── helpers/                   # 测试辅助工具
+    # (e.g., database-helper.ts, mock-okx-client.ts)
 ```
 
-### E2E Tests
-
-```text
-tests/e2e/
-├── grid-strategy-lifecycle.test.ts  # 完整网格策略生命周期
-├── trading-scenarios.test.ts        # 各种交易场景
-├── error-recovery.test.ts           # 错误恢复场景
-└── multi-strategy.test.ts           # 多策略并行测试
-```
 
 ## Test Examples
 
