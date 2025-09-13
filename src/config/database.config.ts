@@ -8,7 +8,9 @@ export interface IDatabaseConfig {
 }
 
 export const databaseConfig: IDatabaseConfig = {
-  path: (typeof process !== 'undefined' ? process.env.DATABASE_PATH : undefined) ?? './data/xboost-trader.db',
+  path:
+    (typeof process !== 'undefined' ? process.env.DATABASE_PATH : undefined) ??
+    './data/xboost-trader.db',
   inMemory: false,
   enableWAL: true,
   enableForeignKeys: true,

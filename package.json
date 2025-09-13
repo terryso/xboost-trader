@@ -37,10 +37,15 @@
   "author": "XBoost Team",
   "license": "MIT",
   "dependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/sqlite3": "^3.1.11",
+    "chalk": "^4.1.2",
     "commander": "^11.0.0",
+    "js-yaml": "^4.1.0",
     "sqlite3": "^5.1.7",
-    "winston": "^3.10.0"
+    "winston": "^3.10.0",
+    "yaml": "^2.8.1",
+    "zod": "^4.1.8"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
