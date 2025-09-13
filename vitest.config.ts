@@ -70,7 +70,7 @@ export default defineConfig({
     },
     
     // Reporter configuration
-    reporter: ['verbose', 'json', 'html'],
+    reporter: ['verbose', 'html'],
     
     // Watch mode
     watch: false,

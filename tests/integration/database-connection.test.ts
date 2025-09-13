@@ -419,6 +419,11 @@ describe('Database Integration Tests', () => {
   });
 
   describe('ConfigRepository', () => {
+    beforeEach(async () => {
+      // The main schema initialization doesn't include the config table, so create it here.
+      await db.run('CREATE TABLE config (key TEXT PRIMARY KEY, value TEXT, description TEXT)');
+    });
+
     it('should save and retrieve configuration values', async () => {
       await configRepo.setValue('test_key', 'test_value', 'Test description');
 

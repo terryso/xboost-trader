@@ -1,6 +1,7 @@
 import { BaseRepository } from './BaseRepository';
 import type { IWallet, WalletRow } from '../models/types/database.types';
 import type { DatabaseConnection } from '../utils/DatabaseConnection';
+import { promisify } from 'util';
 
 export class WalletRepository extends BaseRepository<IWallet, WalletRow> {
   constructor(db: DatabaseConnection) {
@@ -87,7 +88,7 @@ export class WalletRepository extends BaseRepository<IWallet, WalletRow> {
   // Override save method to handle address-based upsert
   async save(entity: IWallet): Promise<void> {
     try {
-      await this.db.transaction(async () => {
+      await this.db.transaction(async (db) => {
         const existing = await this.findById(entity.address);
         if (existing) {
           await this.updateByAddress(entity);
@@ -135,16 +136,22 @@ export class WalletRepository extends BaseRepository<IWallet, WalletRow> {
    */
   async setAsDefault(address: string): Promise<void> {
     try {
-      await this.db.transaction(async () => {
-        // Unset all default wallets
-        await this.db.run('UPDATE wallets SET is_default = 0');
+      await this.db.transaction(async (db) => {
+        await new Promise<void>((resolve, reject) => {
+          db.run('UPDATE wallets SET is_default = 0', (err) => {
+            if (err) return reject(err);
+            resolve();
+          });
+        });
 
-        // Set the specified wallet as default
-        const result = await this.db.run('UPDATE wallets SET is_default = 1 WHERE address = ?', [
-          address,
-        ]);
+        const result = await new Promise<{ changes: number }>((resolve, reject) => {
+          db.run('UPDATE wallets SET is_default = 1 WHERE address = ?', [address], function (err) {
+            if (err) return reject(err);
+            resolve(this);
+          });
+        });
 
-        if (!result || result.changes === 0) {
+        if (result.changes === 0) {
           throw new Error(`No wallet found with address ${address}`);
         }
       });

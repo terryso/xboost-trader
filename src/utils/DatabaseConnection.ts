@@ -123,13 +123,15 @@ export class DatabaseConnection {
       throw new Error('Database not initialized');
     }
 
-    const runAsync = promisify(this.db.run.bind(this.db));
-
-    try {
-      return await runAsync(sql, params);
-    } catch (error) {
-      throw new Error(`Database operation failed: ${error.message}`);
-    }
+    return new Promise<sqlite3.RunResult>((resolve, reject) => {
+      this.db!.run(sql, params, function(err) {
+        if (err) {
+          reject(new Error(`Database operation failed: ${err.message}`));
+        } else {
+          resolve(this);
+        }
+      });
+    });
   }
 
   async transaction<T>(callback: (db: sqlite3.Database) => Promise<T>): Promise<T> {
@@ -137,15 +139,13 @@ export class DatabaseConnection {
       throw new Error('Database not initialized');
     }
 
-    const runAsync = promisify(this.db.run.bind(this.db));
-
     try {
-      await runAsync('BEGIN TRANSACTION');
+      await this.run('BEGIN TRANSACTION');
       const result = await callback(this.db);
-      await runAsync('COMMIT');
+      await this.run('COMMIT');
       return result;
     } catch (error) {
-      await runAsync('ROLLBACK');
+      await this.run('ROLLBACK');
       throw new Error(`Transaction failed: ${error.message}`);
     }
   }
