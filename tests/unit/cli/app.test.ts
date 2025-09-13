@@ -2,11 +2,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { main } from '../../../src/app.js';
 
 describe('App Entry Point', () => {
-  let mockExit: ReturnType<typeof vi.spyOn>;
   let mockConsoleError: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    mockExit = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
     mockConsoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     
     // Reset process.argv to clean state
@@ -31,7 +29,11 @@ describe('App Entry Point', () => {
     
     process.argv = ['node', 'app.js', '--help'];
     
-    await main();
+    try {
+      await main();
+    } catch (error) {
+      expect(error.code).toBe('commander.helpDisplayed');
+    }
     
     expect(capturedOutput).toContain('XBoost Trader');
     expect(capturedOutput).toContain('Advanced Grid Trading Bot');
@@ -57,7 +59,11 @@ describe('App Entry Point', () => {
     
     process.argv = ['node', 'app.js', '--help'];
     
-    await main();
+    try {
+      await main();
+    } catch (error) {
+      expect(error.code).toBe('commander.helpDisplayed');
+    }
     
     // Check for global options in help output
     expect(capturedOutput).toContain('--config');
@@ -69,7 +75,7 @@ describe('App Entry Point', () => {
 
   it('should validate CLI arguments', async () => {
     // Test that CLI validates arguments properly
-    process.argv = ['node', 'app.js', '--config', 'valid-config.yaml'];
+    process.argv = ['node', 'app.js', 'init', '--config', 'valid-config.yaml'];
     
     await expect(main()).resolves.toBeUndefined();
     
@@ -85,7 +91,11 @@ describe('App Entry Point', () => {
     
     process.argv = ['node', 'app.js', 'init', '--help'];
     
-    await main();
+    try {
+      await main();
+    } catch (error) {
+      expect(error.code).toBe('commander.helpDisplayed');
+    }
     
     expect(capturedOutput).toContain('init');
     expect(capturedOutput).toContain('initialize');

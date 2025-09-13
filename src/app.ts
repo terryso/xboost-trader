@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import { fileURLToPath } from 'url';
 import { ConfigManager } from './services/ConfigManager';
 import { DatabaseConnection } from './utils/DatabaseConnection';
 import { testDatabaseConfig } from './config/database.config'; // Using test config for now
@@ -17,6 +18,7 @@ export async function main(): Promise<void> {
     .name('xboost')
     .description('XBoost Trader - Advanced Grid Trading Bot for OKX DEX')
     .version('0.1.0')
+    .exitOverride()
     .option('-c, --config <path>', 'configuration file path', './config/config.yaml')
     .option('-v, --verbose', 'enable verbose logging')
     .option('-q, --quiet', 'suppress non-error output')
@@ -69,7 +71,9 @@ export async function main(): Promise<void> {
   await program.parseAsync(process.argv);
 }
 
-main().catch(error => {
-  console.error('Unhandled error in main:', error);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch(error => {
+    console.error('Unhandled error in main:', error);
+    process.exit(1);
+  });
+}

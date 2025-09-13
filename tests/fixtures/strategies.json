@@ -1,0 +1,22 @@
+[
+  {
+    "strategyId": "grid-btc-usdt-001",
+    "instrumentId": "BTC-USDT",
+    "lowerBound": 50000,
+    "upperBound": 70000,
+    "numberOfGrids": 20,
+    "investment": 10000,
+    "mode": "arithmetic",
+    "isActive": true
+  },
+  {
+    "strategyId": "grid-eth-usdt-002",
+    "instrumentId": "ETH-USDT",
+    "lowerBound": 3000,
+    "upperBound": 4000,
+    "numberOfGrids": 15,
+    "investment": 5000,
+    "mode": "geometric",
+    "isActive": false
+  }
+]

@@ -9,9 +9,12 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:unit": "vitest run --test-name-pattern 'unit'",
+    "test:integration": "vitest run --test-name-pattern 'integration'",
+    "test:e2e": "vitest run --test-name-pattern 'e2e'",
+    "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage",
     "dev": "tsx watch src/app.ts",
     "lint": "eslint src tests",
     "lint:fix": "eslint src tests --fix",
@@ -59,6 +62,7 @@
     "husky": "^8.0.3",
     "lint-staged": "^15.0.0",
     "prettier": "^3.0.0",
+    "sqlite": "^5.1.1",
     "tsx": "^4.0.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"
